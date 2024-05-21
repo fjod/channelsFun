@@ -5,6 +5,7 @@ using System.Threading.Channels;
 
 Console.WriteLine("Hello, World!");
 
+// Create channel which can hold only 3 items
 var ch = Channel.CreateBounded<int>( new BoundedChannelOptions(3)
 {
     SingleWriter = true,
@@ -12,21 +13,23 @@ var ch = Channel.CreateBounded<int>( new BoundedChannelOptions(3)
     FullMode = BoundedChannelFullMode.Wait
 });
 
-List<Task> consumers = new List<Task>();
+// create 3 readers
 for (int i = 0; i < 3; i++)
 {
-    var consumer = Task.Run(async () =>
+    _ = Task.Run(async () =>
     {
+        // each reader gets data from channel
         await foreach (var message in ch.Reader.ReadAllAsync())
         {
             Console.WriteLine($"Starting {message}-th task");
+            
+            // start and await for completion
             await StartAndWaitForProcess();
         }
     });
-    
-    consumers.Add(consumer);
 }
 
+// single writer, which writes to channel as readers become available
 for (int i = 0; i < 50; i++)
 {
     while (!ch.Writer.TryWrite(i))
@@ -35,8 +38,9 @@ for (int i = 0; i < 50; i++)
     }
     
 }
+// finish writing
 ch.Writer.Complete();
-await Task.WhenAll(consumers);
+
 
 async Task StartAndWaitForProcess()
 {
