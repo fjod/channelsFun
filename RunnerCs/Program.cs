@@ -18,9 +18,11 @@ for (int i = 0; i < 3; i++)
 {
     _ = Task.Run(async () =>
     {
-        // each reader gets data from channel
-        await foreach (var message in ch.Reader.ReadAllAsync())
+        // each reader continuously gets data from channel
+        //await foreach (var message in ch.Reader.ReadAllAsync()) // instead of next 2 lines one can use IAsyncEnumerable
+        while (await ch.Reader.WaitToReadAsync())
         {
+            var message = ch.Reader.ReadAsync();
             Console.WriteLine($"Starting {message}-th task");
             
             // start and await for completion
@@ -44,7 +46,7 @@ ch.Writer.Complete();
 
 async Task StartAndWaitForProcess()
 {
-    var processStartInfo = new ProcessStartInfo("job\\LongRunningOperation.exe");
+    var processStartInfo = new ProcessStartInfo(@"..\..\..\..\LongRunningOperation\bin\debug\net8.0\LongRunningOperation.exe");
     processStartInfo.RedirectStandardError = true;
     processStartInfo.UseShellExecute = false;
     var ret = Process.Start(processStartInfo);

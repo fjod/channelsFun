@@ -4,6 +4,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "LongRunningOperation", "Lon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunnerCs", "RunnerCs\RunnerCs.csproj", "{F9260780-443A-4CEA-86D1-A55D32A211E1}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RunnerFs", "RunnerFs\RunnerFs.fsproj", "{C0B3D9BA-3E6F-4940-88BE-3809B7E41B80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{F9260780-443A-4CEA-86D1-A55D32A211E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9260780-443A-4CEA-86D1-A55D32A211E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9260780-443A-4CEA-86D1-A55D32A211E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0B3D9BA-3E6F-4940-88BE-3809B7E41B80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0B3D9BA-3E6F-4940-88BE-3809B7E41B80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0B3D9BA-3E6F-4940-88BE-3809B7E41B80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0B3D9BA-3E6F-4940-88BE-3809B7E41B80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
