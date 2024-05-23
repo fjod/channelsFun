@@ -4,6 +4,7 @@ open System
 open System.Diagnostics
 open System.Threading
 open System.Threading.Channels
+open System.Threading.Tasks
 
 printfn "Hello from F#"
 
@@ -24,10 +25,22 @@ let StartLongRun(writer: ChannelWriter<string>) (token : CancellationToken) (cou
         let! _ = writer.WriteAsync($"finished {counter}", token)
         ()
     }
+
+
+
+let StartReader() = 
     
-let StartReader() =
     let localChan = Channel.CreateBounded(boundedOptions)
     let localToken = new CancellationTokenSource()
+    
+    let LocalReader() =
+         task{
+                let! result = localChan.Reader.ReadAsync(localToken.Token) // as any of operation completes
+                printfn $"Completed with task:{result}"
+                localToken.Cancel() //cancel other ones
+          }        
+        
+    LocalReader() |> ignore // start hot task to read first completed operation
     task { 
       while localToken.IsCancellationRequested |> not do
         let! gotMsg = mainChannel.Reader.WaitToReadAsync(localToken.Token)
@@ -35,11 +48,10 @@ let StartReader() =
             | true ->
                         let! msg = mainChannel.Reader.ReadAsync(localToken.Token)
                         printfn $"Starting {msg}-th task"
-                        StartLongRun localChan.Writer localToken.Token msg |> ignore // start hot task
+                        StartLongRun localChan.Writer localToken.Token msg |> ignore // start long running op in hot task
             | false ->
-                let! result = localChan.Reader.ReadAsync(localToken.Token) // as any of operation completes
-                printfn $"Completed with task:{result}"
-                localToken.Cancel() //cancel other ones
+                do! Task.Delay(10) // sanity check
+               
       printfn "reader while loop exited"
     } |> ignore
     ()
@@ -55,6 +67,6 @@ Thread.Sleep 100
 mainChannel.Writer.TryWrite(555) |> ignore
 
 // when any operation completes - all other operations inside this reader will be cancelled
-mainChannel.Writer.Complete()
+mainChannel.Writer.Complete() // WaitToReadAsync will return false after this
 
 Console.ReadKey() |> ignore
